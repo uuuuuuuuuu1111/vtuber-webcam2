@@ -1,75 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VTuber Pose WebApp</title>
     <style>
-      body {
-        background: #111;
-        color: white;
-        font-family: sans-serif;
-        text-align: center;
-        margin: 0;
-        padding: 0;
-      }
-      canvas {
-        background: #222;
-        display: block;
-        margin: auto;
-        border: 2px solid #444;
-      }
+        body {
+            background-color: black;
+            color: white;
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        #video {
+            margin-top: 20px;
+            border: 2px solid white;
+        }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.min.js"></script>
-  </head>
-  <body>
-    <h1>🎥 VTuber Pose WebApp</h1>
+</head>
+<body>
+    <h1>📷 VTuber Pose WebApp</h1>
     <p>Включи камеру, и скелет будет отображаться!</p>
-    <video id="video" style="display:none;"></video>
-    <canvas id="output" width="640" height="480"></canvas>
+
+    <video id="video" autoplay playsinline width="640" height="480"></video>
 
     <script>
-      const videoElement = document.getElementById('video');
-      const canvasElement = document.getElementById('output');
-      const ctx = canvasElement.getContext('2d');
-
-      function drawSkeleton(landmarks) {
-        ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-        ctx.fillStyle = 'red';
-        ctx.strokeStyle = 'lime';
-        ctx.lineWidth = 2;
-        for (let lm of landmarks) {
-          ctx.beginPath();
-          ctx.arc(lm.x * canvasElement.width, lm.y * canvasElement.height, 5, 0, 2 * Math.PI);
-          ctx.fill();
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                document.getElementById('video').srcObject = stream;
+            } catch (err) {
+                console.error("Ошибка доступа к камере:", err);
+                alert("Не удалось получить доступ к камере. Разрешите использование в настройках браузера.");
+            }
         }
-      }
 
-      const pose = new window.Pose.Pose({
-        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
-      });
-      pose.setOptions({
-        modelComplexity: 1,
-        smoothLandmarks: true,
-        enableSegmentation: false,
-        minDetectionConfidence: 0.5,
-        minTrackingConfidence: 0.5
-      });
-      pose.onResults((results) => {
-        if (results.poseLandmarks) {
-          drawSkeleton(results.poseLandmarks);
-        }
-      });
-
-      const camera = new window.CameraUtils.Camera(videoElement, {
-        onFrame: async () => {
-          await pose.send({ image: videoElement });
-        },
-        width: 640,
-        height: 480
-      });
-      camera.start();
+        // Запускаем при загрузке
+        window.addEventListener('load', startCamera);
     </script>
-  </body>
+</body>
 </html>
