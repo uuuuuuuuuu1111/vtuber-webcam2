@@ -3,27 +3,59 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VTuber Tracker</title>
+    <title>VTuber Tracker — improved</title>
     <style>
+        html, body { height: 100%; }
         body {
             margin: 0;
             overflow: hidden;
             background: transparent;
+            font-family: Arial, Helvetica, sans-serif;
         }
-        canvas {
+        #output {
             position: absolute;
             top: 0;
             left: 0;
+            width: 100vw;
+            height: 100vh;
+        }
+        #status {
+            position: absolute;
+            right: 12px;
+            top: 12px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 10;
+            max-width: 320px;
+        }
+        #hint {
+            position: absolute;
+            left: 12px;
+            bottom: 12px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            z-index: 10;
+            max-width: 420px;
         }
     </style>
 </head>
 <body>
     <video id="webcam" autoplay playsinline style="display:none;"></video>
     <canvas id="output"></canvas>
+    <div id="status">Инициализация...</div>
+    <div id="hint">Если камера не запускается: откройте этот проект через локальный сервер (например, <code>python -m http.server</code>), а не по <code>file://</code>.</div>
 
+    <!-- MediaPipe scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+
     <script src="js/app.js"></script>
 </body>
 </html>
