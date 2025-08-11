@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VTuber WebApp</title>
+<style>
+  body { margin:0; background:#222; color:white; font-family:sans-serif; text-align:center; }
+  video { display:none; }
+  canvas { background:transparent; }
+  #controls { position:fixed; top:10px; left:10px; background:rgba(0,0,0,0.5); padding:10px; border-radius:8px; }
+</style>
+</head>
+<body>
+<h1>VTuber WebApp</h1>
+<video id="video" autoplay playsinline></video>
+<canvas id="output" width="640" height="480"></canvas>
+<div id="controls">
+  <button onclick="toggleBackground()">Toggle Background</button>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js"></script>
+<script src="./js/app.js"></script>
+</body>
+</html>
