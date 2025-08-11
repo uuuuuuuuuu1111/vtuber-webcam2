@@ -1,37 +1,34 @@
-const video = document.getElementById('video');
-const canvas = document.getElementById('output');
-const ctx = canvas.getContext('2d');
+const videoElement = document.getElementById('webcam');
+const canvasElement = document.getElementById('output');
+const ctx = canvasElement.getContext('2d');
 
-let bgOn = true;
-let vtuberImg = new Image();
-vtuberImg.src = './assets/character.png';
+const character = new Image();
+character.src = 'assets/character.png';
 
-let bgImg = new Image();
-bgImg.src = './assets/bg.png';
+canvasElement.width = window.innerWidth;
+canvasElement.height = window.innerHeight;
 
-navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
-    video.srcObject = stream;
+// Настройка MediaPipe Holistic
+const holistic = new Holistic.Holistic({
+    locateFile: (file) => {
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`;
+    }
 });
 
-function toggleBackground() {
-    bgOn = !bgOn;
-}
-
-const pose = new Pose({locateFile: (file) => {
-    return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
-}});
-pose.setOptions({
+holistic.setOptions({
     modelComplexity: 1,
     smoothLandmarks: true,
     enableSegmentation: false,
+    refineFaceLandmarks: true,
     minDetectionConfidence: 0.5,
     minTrackingConfidence: 0.5
 });
-pose.onResults(onResults);
 
-const camera = new Camera(video, {
+holistic.onResults(onResults);
+
+const camera = new Camera(videoElement, {
     onFrame: async () => {
-        await pose.send({image: video});
+        await holistic.send({ image: videoElement });
     },
     width: 640,
     height: 480
@@ -39,9 +36,20 @@ const camera = new Camera(video, {
 camera.start();
 
 function onResults(results) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (bgOn) {
-        ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+    let x = canvasElement.width / 2;
+    let y = canvasElement.height / 2;
+    let scale = 1;
+
+    if (results.poseLandmarks) {
+        const nose = results.poseLandmarks[0]; // точка носа
+        x = nose.x * canvasElement.width;
+        y = nose.y * canvasElement.height;
+        scale = 1 + (results.poseLandmarks[11].y - results.poseLandmarks[12].y) * 2; // простая реакция на позу плеч
     }
-    ctx.drawImage(vtuberImg, 200, 100, 240, 360);
+
+    const imgWidth = character.width * scale;
+    const imgHeight = character.height * scale;
+    ctx.drawImage(character, x - imgWidth / 2, y - imgHeight / 2, imgWidth, imgHeight);
 }
